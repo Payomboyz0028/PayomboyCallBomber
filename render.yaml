@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: payomboy-call-bomber
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run_bot.py
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PORT
+        value: 10000
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_CLIENT_SECRET
+        sync: false
+      - key: ADMIN_USER_IDS
+        sync: false
+      - key: ALLOWED_ROLE_IDS
+        sync: false
+      - key: MAX_ROUNDS_LIMIT
+        value: "5"
+      - key: MAX_CONCURRENCY_LIMIT
+        value: "10"
+      - key: COOLDOWN_SECONDS
+        value: "30"

