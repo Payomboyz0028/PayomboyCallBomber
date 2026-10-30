@@ -11,6 +11,9 @@ from bot.security import SecurityGuard
 from bot.views import (
     ControlPanelView,
     build_panel_embed,
+    build_bomber_v2_payload,
+    send_bomber_v2_panel,
+    edit_bomber_v2_panel,
     AttackModal,
     current_engine_instance,
     get_active_providers_file,
@@ -91,14 +94,19 @@ async def _deploy_panel(interaction: discord.Interaction):
             ephemeral=True
         )
 
-    embed = build_panel_embed()
-    view = ControlPanelView()
-    banner_path = get_active_banner_path()
-    if banner_path and os.path.exists(banner_path):
-        file = discord.File(banner_path, filename="banner.gif")
-        await interaction.followup.send(embed=embed, file=file, view=view)
+    token = interaction.client.http.token if interaction.client and interaction.client.http else None
+    ok, res = await send_bomber_v2_panel(interaction.channel_id, bot_token=token)
+    if ok:
+        await interaction.followup.send("✅ **ติดตั้งแผงควบคุม Payomboy Call Bomber (Components V2) สำเร็จเรียบร้อยแล้ว!**", ephemeral=True)
     else:
-        await interaction.followup.send(embed=embed, view=view)
+        embed = build_panel_embed()
+        view = ControlPanelView()
+        banner_path = get_active_banner_path()
+        if banner_path and os.path.exists(banner_path):
+            file = discord.File(banner_path, filename="banner.gif")
+            await interaction.followup.send(embed=embed, file=file, view=view)
+        else:
+            await interaction.followup.send(embed=embed, view=view)
 
 
 @bot.tree.command(name="set_panel", description="Deploy the interactive PayomboyCallBomber Control Panel")

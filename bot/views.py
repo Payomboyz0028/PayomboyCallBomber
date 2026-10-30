@@ -1,8 +1,9 @@
 import os
 import asyncio
+import aiohttp
 import discord
 from discord import ui
-from typing import Optional, List
+from typing import Optional, List, Tuple, Any
 
 from bot.security import SecurityGuard
 from core.phone import PhoneNumber
@@ -105,6 +106,193 @@ def build_panel_embed() -> discord.Embed:
         embed.set_image(url="attachment://banner.gif")
 
     return embed
+
+
+DEFAULT_BOMBER_BANNER_URL = "https://cdn.discordapp.com/attachments/1565150107513520179/1565169276741226659/banner.gif"
+
+def build_bomber_v2_payload(banner_url: Optional[str] = None) -> dict:
+    """Builds Discord Components V2 Container message (flags: 32768) matching the expanded Auto Quest layout."""
+    active_file = get_active_providers_file()
+    active_pool_name = SettingsManager.get_active_pool()
+    providers = ProviderLoader.load(active_file)
+    call_count = len([p for p in providers if p.type == "call"])
+    sms_count = len([p for p in providers if p.type == "sms"])
+
+    is_busy = SecurityGuard.is_engine_busy()
+    state_badge = "🔴 BUSY (RUNNING ATTACK)" if is_busy else "🟢 IDLE (READY)"
+    target_info = SecurityGuard.get_active_target() or "None"
+    tls_engine = "curl_cffi (Chrome124 Stealth)" if HAS_CURL_CFFI else "httpx (Standard OpenSSL)"
+
+    total_master = 0
+    try:
+        total_master = len(ProviderLoader.load(PROVIDERS_FILE))
+    except Exception:
+        total_master = len(providers)
+
+    total_verified = 0
+    try:
+        total_verified = len(ProviderLoader.load(VERIFIED_FILE))
+    except Exception:
+        total_verified = 16
+
+    output_ch_id = SettingsManager.get_output_channel_id()
+    channel_display = f"<#{output_ch_id}>" if output_ch_id else "`Default (Current Channel)`"
+    pool_badge = "🔥 Master Matrix (160 Endpoints)" if active_pool_name == "master" else "⚡ Verified High-Yield (13 Endpoints)"
+
+    body_text = (
+        "> <:payomboyz:1551064225974325318> **ระบบทดสอบความทนทานต่อสแปมเบอร์โทรศัพท์และ SMS ความเร็วสูง (RedTeam Stress-Testing)**\n"
+        f"> 🛡️ **Engine State:** `{state_badge}` • **TLS Engine:** `{tls_engine}`\n"
+        f"> 🎯 **Active Target:** `{target_info}` • **Output Channel:** {channel_display}\n"
+        f"> 📦 **Active Pool Mode:** **{pool_badge}** (`{len(providers)} providers`)\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+        "📊 **Provider Matrix Overview:**\n"
+        f"• **Verified Core:** `{total_verified}` gateways (100% Delivery Rate)\n"
+        f"• **Master Pool:** `{total_master}` gateways (Full Thai & Multi Matrix)\n"
+        f"• **Active Breakdown:** Voice: `{call_count}` | SMS: `{sms_count}`\n"
+        "• **Pacing:** SMS 0.5s-2s / Voice 10s cooldown\n\n"
+        "🕹️ **Quick Controls Guide:**\n"
+        "• 🚀 **Start Attack** → ป้อนเบอร์โทรศัพท์เป้าหมายและเริ่มยิงสลับโหมด Call / SMS\n"
+        "• 🔄 **Switch Pool** → สลับระหว่าง Verified Core (16) และ Master Matrix (58/160)\n"
+        "• 📊 **Status** → ตรวจสอบสถานะและ Latency ของเกตเวย์\n"
+        "• 🔍 **Health Audit** → ตรวจสอบความพร้อมของเกตเวย์ทั้งหมดและตัดตัวที่ตายออก\n"
+        "• 📋 **View Pool** → ดูรายชื่อผู้ให้บริการ SMS / Call ทั้งหมดในระบบ"
+    )
+
+    media_banner = banner_url or DEFAULT_BOMBER_BANNER_URL
+    color_val = 0xff0033 if is_busy else 65484
+
+    return {
+        "flags": 32768,
+        "embeds": [],
+        "components": [
+            {
+                "type": 17,
+                "accent_color": color_val,
+                "components": [
+                    {
+                        "type": 10,
+                        "content": "## <a:pbg_wing_l:1562553182859563150> **PAYOMBOY CALL BOMBER — CONTROL PANEL** <a:pbg_wing_r:1562553185325940748>\n### ⚡ **ADVANCED TELEPHONY & SMS SECURITY STRESS-TESTING PLATFORM**"
+                    },
+                    {"type": 14, "divider": True, "spacing": 1},
+                    {
+                        "type": 10,
+                        "content": body_text
+                    },
+                    {"type": 14, "divider": True, "spacing": 1},
+                    {
+                        "type": 1,
+                        "components": [
+                            {
+                                "type": 2,
+                                "custom_id": "btn_start_attack",
+                                "style": 4,
+                                "label": "Start Attack",
+                                "emoji": {"name": "🚀"}
+                            },
+                            {
+                                "type": 2,
+                                "custom_id": "btn_toggle_pool",
+                                "style": 2,
+                                "label": "Switch Pool",
+                                "emoji": {"name": "🔄"}
+                            },
+                            {
+                                "type": 2,
+                                "custom_id": "btn_status",
+                                "style": 2,
+                                "label": "Status",
+                                "emoji": {"name": "📊"}
+                            }
+                        ]
+                    },
+                    {
+                        "type": 1,
+                        "components": [
+                            {
+                                "type": 2,
+                                "custom_id": "btn_health_audit",
+                                "style": 2,
+                                "label": "Health Audit",
+                                "emoji": {"name": "🔍"}
+                            },
+                            {
+                                "type": 2,
+                                "custom_id": "btn_view_pool",
+                                "style": 2,
+                                "label": "View Pool",
+                                "emoji": {"name": "📋"}
+                            },
+                            {
+                                "type": 2,
+                                "custom_id": "btn_refresh_panel",
+                                "style": 2,
+                                "label": "Refresh",
+                                "emoji": {"name": "🔄"}
+                            }
+                        ]
+                    },
+                    {"type": 14, "divider": True, "spacing": 1},
+                    {
+                        "type": 10,
+                        "content": "**POWERED BY PAYOMBØYZ TELEPHONY ENGINE • ZERO-ATTACHMENT ARCHITECTURE**"
+                    },
+                    {"type": 14, "divider": True, "spacing": 1},
+                    {
+                        "type": 12,
+                        "items": [
+                            {
+                                "media": {
+                                    "url": media_banner,
+                                    "width": 960,
+                                    "height": 540
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+
+async def send_bomber_v2_panel(channel_id: int, bot_token: Optional[str] = None, banner_url: Optional[str] = None) -> Tuple[bool, Any]:
+    token = bot_token or os.environ.get("DISCORD_TOKEN")
+    if not token:
+        return False, "No bot token provided"
+    url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json",
+        "User-Agent": "DiscordBot (https://github.com/Payomboyz0028/PayomboyCallBomber, 1.0)"
+    }
+    payload = build_bomber_v2_payload(banner_url=banner_url)
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=payload) as r:
+            try:
+                data = await r.json()
+            except Exception:
+                data = await r.text()
+            return r.status in (200, 201), data
+
+
+async def edit_bomber_v2_panel(channel_id: int, message_id: int, bot_token: Optional[str] = None, banner_url: Optional[str] = None) -> Tuple[bool, Any]:
+    token = bot_token or os.environ.get("DISCORD_TOKEN")
+    if not token:
+        return False, "No bot token provided"
+    url = f"https://discord.com/api/v10/channels/{channel_id}/messages/{message_id}"
+    headers = {
+        "Authorization": f"Bot {token}",
+        "Content-Type": "application/json",
+        "User-Agent": "DiscordBot (https://github.com/Payomboyz0028/PayomboyCallBomber, 1.0)"
+    }
+    payload = build_bomber_v2_payload(banner_url=banner_url)
+    async with aiohttp.ClientSession() as session:
+        async with session.patch(url, headers=headers, json=payload) as r:
+            try:
+                data = await r.json()
+            except Exception:
+                data = await r.text()
+            return r.status == 200, data
 
 
 class AttackModal(ui.Modal, title="⚡ Launch Telephony Stress Test"):
@@ -328,8 +516,16 @@ class ControlPanelView(ui.View):
         new_pool = "master" if current == "verified" else "verified"
         SettingsManager.set_active_pool(new_pool)
         
-        embed = build_panel_embed()
-        await interaction.response.edit_message(embed=embed, view=self)
+        try:
+            await interaction.response.defer()
+            token = interaction.client.http.token if interaction.client and interaction.client.http else None
+            ok, _ = await edit_bomber_v2_panel(interaction.channel_id, interaction.message.id, bot_token=token)
+            if not ok:
+                embed = build_panel_embed()
+                await interaction.edit_original_response(embed=embed, view=self)
+        except Exception:
+            embed = build_panel_embed()
+            await interaction.response.edit_message(embed=embed, view=self)
 
     @ui.button(label="📊 Status", style=discord.ButtonStyle.secondary, custom_id="btn_status", row=0)
     async def btn_status(self, interaction: discord.Interaction, button: ui.Button):
@@ -438,5 +634,13 @@ class ControlPanelView(ui.View):
 
     @ui.button(label="🔄 Refresh", style=discord.ButtonStyle.secondary, custom_id="btn_refresh_panel", row=1)
     async def btn_refresh_panel(self, interaction: discord.Interaction, button: ui.Button):
-        embed = build_panel_embed()
-        await interaction.response.edit_message(embed=embed, view=self)
+        try:
+            await interaction.response.defer()
+            token = interaction.client.http.token if interaction.client and interaction.client.http else None
+            ok, _ = await edit_bomber_v2_panel(interaction.channel_id, interaction.message.id, bot_token=token)
+            if not ok:
+                embed = build_panel_embed()
+                await interaction.edit_original_response(embed=embed, view=self)
+        except Exception:
+            embed = build_panel_embed()
+            await interaction.response.edit_message(embed=embed, view=self)
