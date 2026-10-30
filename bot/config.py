@@ -18,6 +18,9 @@ class BotConfig:
     ALLOWED_ROLE_IDS: List[int] = [
         int(rid.strip()) for rid in os.getenv("ALLOWED_ROLE_IDS", "").split(",") if rid.strip().isdigit()
     ]
+    ALLOWED_CHANNEL_IDS: List[int] = [
+        int(cid.strip()) for cid in os.getenv("ALLOWED_CHANNEL_IDS", "").split(",") if cid.strip().isdigit()
+    ]
     
     # Engine Guardrails
     MAX_ROUNDS_LIMIT: int = int(os.getenv("MAX_ROUNDS_LIMIT", "5"))

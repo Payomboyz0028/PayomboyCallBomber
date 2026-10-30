@@ -6,5 +6,11 @@
   "request_timeout": 8.0,
   "rotate_user_agents": true,
   "verify_ssl": false,
-  "log_file": "attack.log"
+  "log_file": "attack.log",
+  "output_channel_id": 1565150401009950810,
+  "active_pool": "master",
+  "active_banner": "card2",
+  "allowed_channels": [
+    1565150107513520179
+  ]
 }

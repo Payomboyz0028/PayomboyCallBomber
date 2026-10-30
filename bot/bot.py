@@ -14,6 +14,7 @@ from bot.views import (
     AttackModal,
     current_engine_instance,
     get_active_providers_file,
+    get_active_banner_path,
     PROVIDERS_FILE,
     PROXIES_FILE
 )
@@ -89,12 +90,10 @@ bot = PayomboyBot()
 # SLASH COMMANDS
 # ─────────────────────────────────────────────────────────────
 
-@bot.tree.command(name="set_panel", description="Deploy the interactive PayomboyCallBomber Control Panel")
-async def cmd_set_panel(interaction: discord.Interaction):
-    # Always defer immediately to eliminate Discord 3s timeout
+async def _deploy_panel(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=False)
 
-    if not SecurityGuard.is_authorized(interaction):
+    if not SecurityGuard.is_admin(interaction):
         return await interaction.followup.send(
             "❌ **Access Denied**: Administrator permission required to deploy the Control Panel.",
             ephemeral=True
@@ -102,19 +101,43 @@ async def cmd_set_panel(interaction: discord.Interaction):
 
     embed = build_panel_embed()
     view = ControlPanelView()
-    await interaction.followup.send(embed=embed, view=view)
+    banner_path = get_active_banner_path()
+    if banner_path and os.path.exists(banner_path):
+        file = discord.File(banner_path, filename="banner.gif")
+        await interaction.followup.send(embed=embed, file=file, view=view)
+    else:
+        await interaction.followup.send(embed=embed, view=view)
+
+
+@bot.tree.command(name="set_panel", description="Deploy the interactive PayomboyCallBomber Control Panel")
+async def cmd_set_panel(interaction: discord.Interaction):
+    await _deploy_panel(interaction)
 
 
 @bot.tree.command(name="panel", description="Quick shortcut to deploy the Control Panel")
 async def cmd_panel(interaction: discord.Interaction):
-    await cmd_set_panel(interaction)
+    await _deploy_panel(interaction)
+
+
+@bot.tree.command(name="card", description="Switch active Card GIF banner for the Control Panel")
+@app_commands.describe(choice="card1: Balaclava Toxic Matrix | card2: Balaclava SMS Bomber")
+async def cmd_card(interaction: discord.Interaction, choice: Literal["card1", "card2"]):
+    if not SecurityGuard.is_admin(interaction):
+        return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
+
+    SettingsManager.set_active_banner(choice)
+    label = "Option 1 (Balaclava Toxic Matrix • CALL BOMBER)" if choice == "card1" else "Option 2 (Balaclava Ninja Overdrive • SMS BOMBER)"
+    await interaction.response.send_message(
+        f"🎨 **Panel Banner Configured**: Active card set to **{label}**!\n*Deploy `/panel` to see the new animated card banner.*",
+        ephemeral=True
+    )
 
 
 @bot.tree.command(name="set_channel", description="Set dedicated text channel for attack results & telemetry")
 @app_commands.describe(channel="Text channel to route all stress-test reports and live traces to")
 async def cmd_set_channel(interaction: discord.Interaction, channel: discord.TextChannel):
-    if not SecurityGuard.is_authorized(interaction):
-        return await interaction.response.send_message("❌ **Access Denied**: Unauthorized user.", ephemeral=True)
+    if not SecurityGuard.is_admin(interaction):
+        return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
 
     SettingsManager.set_output_channel_id(channel.id)
     await interaction.response.send_message(
@@ -125,14 +148,52 @@ async def cmd_set_channel(interaction: discord.Interaction, channel: discord.Tex
 
 @bot.tree.command(name="clear_channel", description="Clear output channel and restore default channel output")
 async def cmd_clear_channel(interaction: discord.Interaction):
-    if not SecurityGuard.is_authorized(interaction):
-        return await interaction.response.send_message("❌ **Access Denied**: Unauthorized user.", ephemeral=True)
+    if not SecurityGuard.is_admin(interaction):
+        return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
 
     SettingsManager.set_output_channel_id(None)
     await interaction.response.send_message(
         "📍 **Results Channel Cleared**: Outputs restored to current channels.",
         ephemeral=False
     )
+
+
+@bot.tree.command(name="allow_channel", description="Allow everyone in a specific channel to use the bot")
+@app_commands.describe(channel="Text channel where all members can use the bot")
+async def cmd_allow_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    if not SecurityGuard.is_admin(interaction):
+        return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
+
+    SettingsManager.add_allowed_channel(channel.id)
+    await interaction.response.send_message(
+        f"✅ **Channel Authorized**: Everyone in {channel.mention} (`{channel.id}`) can now use the bot!",
+        ephemeral=False
+    )
+
+
+@bot.tree.command(name="disallow_channel", description="Revoke public bot access from a specific channel")
+@app_commands.describe(channel="Text channel to remove public bot access from")
+async def cmd_disallow_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    if not SecurityGuard.is_admin(interaction):
+        return await interaction.response.send_message("❌ **Access Denied**: Administrator permission required.", ephemeral=True)
+
+    SettingsManager.remove_allowed_channel(channel.id)
+    await interaction.response.send_message(
+        f"🚫 **Channel Revoked**: Public bot access removed from {channel.mention} (`{channel.id}`).",
+        ephemeral=False
+    )
+
+
+@bot.tree.command(name="allowed_channels", description="List channels where everyone can use the bot")
+async def cmd_allowed_channels(interaction: discord.Interaction):
+    channels = SettingsManager.get_allowed_channels()
+    if not channels:
+        desc = "No public channels configured. Only administrators can use the bot."
+    else:
+        desc = "\n".join(f"• <#{cid}> (`{cid}`)" for cid in channels)
+
+    embed = discord.Embed(title="📍 Authorized Bot Channels", description=desc, color=0x00ffcc)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 @bot.tree.command(name="pool", description="Switch active provider pool between Verified and Master")
@@ -153,8 +214,8 @@ async def cmd_pool(interaction: discord.Interaction, choice: Literal["verified",
 @app_commands.describe(
     target="Phone number to test (e.g. 0812345678 or +66812345678)",
     mode="Attack mode: all (Call & SMS), call (Voice Only), sms (SMS Only)",
-    rounds="Number of attack waves (1 to 5)",
-    concurrency="Parallel worker count (1 to 10)"
+    rounds="Number of attack waves (1 to 50)",
+    concurrency="Parallel worker count (1 to 50)"
 )
 async def cmd_attack(
     interaction: discord.Interaction,
@@ -167,8 +228,10 @@ async def cmd_attack(
 
     # 1. Auth check
     if not SecurityGuard.is_authorized(interaction):
+        allowed_ch = SettingsManager.get_allowed_channels()
+        ch_hint = f" Please use in {', '.join(f'<#{cid}>' for cid in allowed_ch)}." if allowed_ch else ""
         return await interaction.response.send_message(
-            "❌ **Access Denied**: You do not have permission to execute this operation.",
+            f"❌ **Access Denied**: Unauthorized user or channel.{ch_hint}",
             ephemeral=True
         )
 
@@ -202,7 +265,7 @@ async def cmd_attack(
 
     await interaction.response.send_message(
         f"🚀 **Dispatching Attack**\nTarget: `{clean_phone}` | Mode: `{mode.upper()}` | Rounds: `{safe_rounds}` | Workers: `{safe_conc}`\n📍 Results will broadcast in: {ch_mention}",
-        ephemeral=False
+        ephemeral=True
     )
 
     async def run_task():
@@ -300,7 +363,7 @@ async def cmd_audit(interaction: discord.Interaction):
     if SecurityGuard.is_engine_busy():
         return await interaction.response.send_message("⚠️ **Engine Busy**: An operation is active.", ephemeral=True)
 
-    await interaction.response.defer(ephemeral=False)
+    await interaction.response.defer(ephemeral=True)
     SecurityGuard.set_engine_state(True, target="AUDIT_BENCHMARK")
 
     try:
@@ -346,9 +409,9 @@ async def cmd_audit(interaction: discord.Interaction):
                 sample += f"\n*...and {len(audit_trace) - 15} more*"
             embed.add_field(name="Gateway Trace", value=sample, inline=False)
 
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, ephemeral=True)
     except Exception as e:
-        await interaction.followup.send(f"❌ **Audit Failed**: `{str(e)[:100]}`")
+        await interaction.followup.send(f"❌ **Audit Failed**: `{str(e)[:100]}`", ephemeral=True)
     finally:
         SecurityGuard.set_engine_state(False, None)
 

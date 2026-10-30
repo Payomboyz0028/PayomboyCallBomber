@@ -23,37 +23,39 @@ class SecurityGuard:
     _active_target = None
 
     @classmethod
-    def is_authorized(cls, interaction: discord.Interaction) -> bool:
+    def is_admin(cls, interaction: discord.Interaction) -> bool:
         """
-        Validates whether the user is authorized to execute security commands.
+        Validates whether the user has administrator privileges.
         Checks:
-        1. Explicit ADMIN_USER_IDS in .env
-        2. Discord Guild Owner
-        3. User has Administrator permission
+        1. Discord Guild Owner
+        2. Explicit ADMIN_USER_IDS in .env
+        3. Discord Administrator permission
         4. User possesses an ALLOWED_ROLE_ID
+        5. If neither ADMIN_USER_IDS nor ALLOWED_ROLE_IDS set:
+           - In DMs: allowed
+           - Guild permissions: administrator, manage_guild, or manage_channels
         """
         user = interaction.user
         
-        # Guild Owner is always allowed
+        # Guild Owner is always admin
         if interaction.guild and interaction.guild.owner_id == user.id:
             return True
 
-        # Check explicit whitelist
+        # Check explicit admin whitelist
         if BotConfig.ADMIN_USER_IDS and user.id in BotConfig.ADMIN_USER_IDS:
             return True
 
-        # Check Discord Administrator permission
+        # Check Discord Administrator permission & roles
         if isinstance(user, discord.Member):
             if user.guild_permissions.administrator:
                 return True
 
-            # Check allowed role IDs
             if BotConfig.ALLOWED_ROLE_IDS:
                 user_role_ids = {r.id for r in user.roles}
                 if any(rid in user_role_ids for rid in BotConfig.ALLOWED_ROLE_IDS):
                     return True
 
-        # If no admin IDs are configured in .env, allow DMs, Administrator, Manage Guild, or Manage Channels
+        # If no admin IDs or roles configured in .env, fallback for server staff
         if not BotConfig.ADMIN_USER_IDS and not BotConfig.ALLOWED_ROLE_IDS:
             if not interaction.guild:
                 return True
@@ -63,6 +65,31 @@ class SecurityGuard:
                 or user.guild_permissions.manage_channels
             ):
                 return True
+
+        return False
+
+    @classmethod
+    def is_authorized(cls, interaction: discord.Interaction) -> bool:
+        """
+        Validates whether the user is authorized to execute security commands / attacks.
+        Checks:
+        1. User is administrator (via is_admin)
+        2. Channel is in ALLOWED_CHANNEL_IDS / allowed_channels setting (allows everyone in that channel)
+        """
+        if cls.is_admin(interaction):
+            return True
+
+        # Whitelisted Channel Check (allows everyone in designated channels)
+        channel_id = getattr(interaction, "channel_id", None) or (interaction.channel.id if interaction.channel else None)
+        parent_id = getattr(interaction.channel, "parent_id", None) if interaction.channel else None
+
+        from core.settings import SettingsManager
+        allowed_channels = SettingsManager.get_allowed_channels()
+
+        if channel_id and channel_id in allowed_channels:
+            return True
+        if parent_id and parent_id in allowed_channels:
+            return True
 
         return False
 
