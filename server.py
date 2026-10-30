@@ -29,7 +29,11 @@ async def run_server():
     await site.start()
     print(f"[+] HTTP Server listening on port {port}", flush=True)
 
-    # Now launch the bot in the background
+    # 1. Start Self-Ping Heartbeat task (Anti-Sleep Pinger)
+    from bot.pinger import start_self_pinger
+    asyncio.create_task(start_self_pinger(port))
+
+    # 2. Launch Discord Bot in background thread
     try:
         from bot.bot import run_discord_bot
         print("[*] Starting Discord Bot background loop...", flush=True)

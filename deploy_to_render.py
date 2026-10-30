@@ -59,18 +59,21 @@ def create_render_service(repo_url: str, service_name: str = "payomboy-call-bomb
             "env": "python",
             "plan": "free",
             "region": "singapore",
-            "buildCommand": "pip install -r requirements.txt",
-            "startCommand": "python run_bot.py",
             "healthCheckPath": "/health",
             "numInstances": 1,
+            "envSpecificDetails": {
+                "buildCommand": "pip install -r requirements.txt",
+                "startCommand": "python run_bot.py"
+            },
             "envVars": [
                 {"key": "PYTHON_VERSION", "value": "3.11.9"},
                 {"key": "PORT", "value": "10000"},
                 {"key": "DISCORD_TOKEN", "value": token},
                 {"key": "DISCORD_CLIENT_ID", "value": client_id},
                 {"key": "DISCORD_CLIENT_SECRET", "value": client_secret},
-                {"key": "MAX_ROUNDS_LIMIT", "value": "5"},
-                {"key": "MAX_CONCURRENCY_LIMIT", "value": "10"},
+                {"key": "ALLOWED_CHANNEL_IDS", "value": "1565150107513520179"},
+                {"key": "MAX_ROUNDS_LIMIT", "value": "50"},
+                {"key": "MAX_CONCURRENCY_LIMIT", "value": "50"},
                 {"key": "COOLDOWN_SECONDS", "value": "30"}
             ]
         }
