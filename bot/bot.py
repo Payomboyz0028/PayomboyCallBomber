@@ -49,6 +49,13 @@ class PayomboyBot(commands.Bot):
         except Exception as e:
             print(f"[-] Web server start note: {e}", flush=True)
 
+        # Start self-pinger heartbeat (Render 4-minute Anti-Sleep)
+        try:
+            from bot.pinger import start_self_pinger
+            asyncio.create_task(start_self_pinger(port))
+        except Exception as e:
+            print(f"[-] Self-pinger note: {e}", flush=True)
+
         # Sync application slash commands globally
         try:
             synced = await self.tree.sync()
