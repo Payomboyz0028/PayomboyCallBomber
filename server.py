@@ -30,6 +30,8 @@ from bot.config import BotConfig
 from bot.bot import bot
 from bot.pinger import start_self_pinger
 
+import discord
+
 RUN_LOGS = []
 START_TIME = time.time()
 
@@ -55,6 +57,7 @@ async def create_app():
         return web.json_response({
             "service": "PayomboyCallBomber",
             "version": "2.5.0",
+            "region": os.getenv("RENDER_REGION", "unknown"),
             "status": "ONLINE" if bot.is_ready() else "CONNECTING",
             "bot_user": str(bot.user) if bot.is_ready() else None,
             "bot_ready": bot.is_ready(),
@@ -80,15 +83,24 @@ async def create_app():
     return app
 
 async def run_bot_task():
+    backoff = 10
     while True:
         try:
             log("[bot_task] Validating credentials and initiating bot.start...")
             BotConfig.validate()
             await bot.start(BotConfig.TOKEN)
+        except discord.errors.HTTPException as e:
+            if e.status == 429:
+                retry_after = getattr(e, "retry_after", None) or backoff
+                log(f"[bot_task 429 RATE LIMIT] Discord Cloudflare blocked this IP. Waiting {retry_after}s before retrying...")
+                backoff = min(backoff * 2, 300)
+                await asyncio.sleep(retry_after)
+            else:
+                log(f"[bot_task ERROR] Discord HTTPException {e.status}: {e}")
+                await asyncio.sleep(10)
         except Exception as e:
             log(f"[bot_task ERROR] Discord Bot encountered error: {type(e).__name__}: {e}")
-            log("[bot_task] Waiting 5 seconds before auto-reconnect...")
-            await asyncio.sleep(5)
+            await asyncio.sleep(10)
 
 async def main():
     port = int(os.getenv("PORT", "10000"))
